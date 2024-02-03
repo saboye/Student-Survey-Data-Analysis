@@ -1,0 +1,132 @@
+---
+title: "Week-7 Assignment"
+author: "SAMUEL ABOYE"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Student Survey Data Analysis
+
+
+### Introduction
+
+This report analyzes the relationships between time spent reading, watching TV, and happiness levels among students based on survey data.
+
+## Data Preparation
+
+```{r read-data, echo=FALSE}
+# Read the survey data from a CSV file.
+survey_data <- read.csv("student-survey.csv")
+
+# Basic data validation to handle NA values, which could affect the analysis.
+survey_data <- na.omit(survey_data)
+```
+Create the following plots of survey variables (first variable is x-axis, second is y-axis):
+
+### TimeReading, TimeTV
+```{r time-reading-vs-time-tv, fig.height=4, fig.width=6, echo=FALSE}
+# Plot to visualize the relationship between time spent reading and time spent watching TV.
+ggplot(survey_data, aes(x = TimeReading, y = TimeTV)) +
+  geom_point(color = "brown") +
+  labs(title = "Time Reading vs. Time TV")
+```
+
+The plot suggests a **strong negative relationship** between time spent reading and time spent watching TV. As time spent reading increases, time spent watching TV decreases.
+
+### TimeReading, Happiness
+
+```{r time-reading-vs-happiness, fig.height=4, fig.width=6, echo=FALSE}
+# Plot to explore the association between time spent reading and happiness levels.
+ggplot(survey_data, aes(x = TimeReading, y = Happiness)) +
+  geom_point(color = "brown") +
+  labs(title = "Time Reading vs. Happiness")
+```
+
+
+### TimeReading vs. Happiness
+
+This plot indicates a **negative relationship** between time spent reading and happiness levels, suggesting that as time spent reading increases, happiness decreases.
+
+### TimeTV, Happiness
+
+```{r time-tv-vs-happiness, fig.height=4, fig.width=6, echo=FALSE}
+# Plot to investigate the relationship between time spent watching TV and happiness.
+ggplot(survey_data, aes(x = TimeTV, y = Happiness)) +
+  geom_point(color = "brown") +
+  labs(title = "Time TV vs. Happiness")
+```
+
+
+### TimeTV vs. Happiness
+
+The relationship between time spent watching TV and happiness appears to be **positive**, indicating that as time spent watching TV increases, happiness levels also increase.
+
+
+
+# Statistical Analysis
+
+We first examine the correlation between our variables of interest: TimeReading, TimeTV, and Happiness.
+
+```{r correlation-analysis,echo=FALSE}
+# Compute the correlation matrix for TimeReading, TimeTV, and Happiness.
+# 'use = "complete.obs"' argument to handle missing values.
+cor_matrix <- cor(survey_data[,c("TimeReading", "TimeTV", "Happiness")], use = "complete.obs")
+#print(cor_matrix)
+
+#Use knitr::kable to display the correlation matrix as a formatted table
+knitr::kable(cor_matrix, caption = "Correlation Matrix for TimeReading, TimeTV, and Happiness")
+
+# Perform a correlation test between TimeReading and TimeTV.
+cor_test <- cor.test(survey_data$TimeReading, survey_data$TimeTV, method = "pearson")
+
+# Display the correlation test results
+# print(cor_test)
+```
+The Pearson correlation test between TimeReading and TimeTV yields the following results:
+
+- Correlation coefficient (r): `r cor_test$estimate`
+- P-value: `r format(cor_test$p.value, scientific = TRUE)`
+- Confidence interval: `r paste(format(cor_test$conf.int[1], digits = 4), "to", format(cor_test$conf.int[2], digits = 4))`
+
+This indicates a `r ifelse(cor_test$estimate < 0, "strong negative", "strong positive")` relationship between the amount of time spent reading and the time spent watching TV. The very low p-value (`r cor_test$p.value`) suggests that this correlation is statistically significant, indicating a strong likelihood that the observed relationship is not due to random chance.
+
+
+### Covariance Matrix Analysis
+
+Though the covariance matrix wasn not explicitly provided, based on the correlation matrix and general principles, we infer:
+
+- A negative covariance between TimeReading and TimeTV suggests that as one variable increases, the other tends to decrease.
+- The relationship between TimeReading and Happiness, and TimeTV and Happiness, would follow a similar interpretation, with negative and positive covariances suggesting inverse and direct relationships, respectively.
+
+### Correlation Matrix Analysis
+
+The correlation matrix provided shows:
+
+- **TimeReading and TimeTV**: A strong negative correlation (-0.8830677), indicating a strong inverse relationship.
+- **TimeReading and Happiness**: A negative correlation (-0.4348663), suggesting that increased reading time is associated with lower happiness.
+- **TimeTV and Happiness**: A positive correlation (0.6365560), indicating that more TV time is associated with higher happiness levels.
+
+### Interpretation: Covariance vs. Correlation Matrix
+
+The correlation matrix is generally easier to interpret because it provides standardized values that describe the strength and direction of the relationship between variables. These values range from -1 to 1, where the magnitude gives the strength, and the sign indicates the direction (positive or negative).
+
+## Correlation Test Between TimeReading and TimeTV
+
+The correlation test results confirm a strong negative correlation (-0.8830677) between TimeReading and TimeTV, with a very low p-value (0.0003153), indicating that the correlation is statistically significant.
+
+### Interpretation
+
+The strong negative correlation suggests that students reading more tend to spend less time watching TV. However, correlation does not imply causation. While there's a significant relationship between TimeReading and TimeTV, we cannot definitively say that more reading causes less TV watching without further causal analysis.
+
+## Conclusion
+
+This analysis highlights the dynamics between students' time allocation to reading and watching TV and their happiness levels. It emphasizes significant correlations that could inform further investigations into the causal relationships between these activities.
